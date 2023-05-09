@@ -7,14 +7,55 @@ def as_array(x):
         return np.array(x)
     return x
 
+
 def mul(x0, x1):
+    x1 = as_array(x1)
     return MulFunction()(x0, x1)
 
 
 def add(x0, x1):
+    x1 = as_array(x1)
     return AddFunction()(x0, x1)
 
+
+def as_variable(obj):
+    if isinstance(obj, Variable):
+        return obj
+    return Variable(obj)
+
+
+def neg(x):
+    return NegFunction()(x)
+
+
+def sub(x0, x1):
+    x1 = as_array(x1)
+    return SubFunction()(x0, x1)
+
+
+def rsub(x0, x1):
+    x1 = as_array(x1)
+    return SubFunction()(x1, x0)
+
+
+def div(x0, x1):
+    x1 = as_array(x1)
+    return DivFunction()(x0, x1)
+
+
+def rdiv(x0, x1):
+    x1 = as_array(x1)
+    return DivFunction()(x1, x0)
+
+
+def pow(x, c):
+    return PowFunction(c)(x)
+
+
 class Variable:
+    # 为了计算 np.array + Variable
+    # 定义 Variable 运算符的优先级高于 np.array
+    __array_priority__ = 200
 
     def __mul__(self, other):
         return mul(self, other)
@@ -108,11 +149,23 @@ class Variable:
     def clean_grad(self):
         self.grad = None
 
+
 Variable.__mul__ = mul
+Variable.__rmul__ = mul
 Variable.__add__ = add
+Variable.__radd__ = add
+Variable.__radd__ = add
+Variable.__neg__ = neg
+Variable.__sub__ = sub
+Variable.__rsub__ = rsub
+Variable.__truediv__ = div
+Variable.__rtruediv__ = rdiv
+Variable.__pow__ = pow
+
 
 class Function:
     def __call__(self, *inputs):
+        inputs = [as_variable(i) for i in inputs]
         xs = [x.data for x in inputs]
         ys = self.forward(*xs)  # 参数上加上*，表示将参数解包，即将列表展开作为参数传递
         if not isinstance(ys, tuple):
@@ -180,7 +233,53 @@ class MulFunction(Function):
         return gy * x1, gy * x0
 
 
+# 取反
+class NegFunction(Function):
+    def forward(self, x):
+        return -x
 
+    def backward(self, gy):
+        return gy, -gy
+
+
+# 减法
+class SubFunction(Function):
+    def forward(self, x0, x1):
+        y = x0 - x1
+        return y
+
+    def backward(self, gy):
+        return -gy
+
+
+# 除法
+class DivFunction(Function):
+    def forward(self, x0, x1):
+        y = x0 / x1
+        return y
+
+    def backward(self, gy):
+        x0 = self.inputs[0].data
+        x1 = self.inputs[1].data
+        gx0 = gy / x1
+        gx1 = gy * (-x0 / x1 ** 2)
+        return gx0, gx1
+
+
+class PowFunction(Function):
+
+    def __init__(self, c):
+        self.c = c
+
+    def forward(self, x):
+        y = x ** self.c
+        return y
+
+    def backward(self, gy):
+        x = self.inputs[0].data
+        c = self.c
+        gx = c * x ** (c - 1) * gy
+        return gx
 
 
 class Config:

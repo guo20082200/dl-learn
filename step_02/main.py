@@ -33,3 +33,13 @@ print(b.grad)
 
 y2 = a * b + c
 print(y2)  # variable(7.0)
+
+a = Variable(np.array(3.0))
+y3 = a + np.array(400)
+print(y3)  # variable(403.0)
+
+y4 = 3.2 * a + 1.0
+print(y4)  # variable(10.600000000000001)
+
+y5 = np.array(400) + a
+print(y5)  # variable(403.0)
