@@ -7,13 +7,48 @@ def as_array(x):
         return np.array(x)
     return x
 
+def mul(x0, x1):
+    return MulFunction()(x0, x1)
+
+
+def add(x0, x1):
+    return AddFunction()(x0, x1)
 
 class Variable:
-    def __init__(self, data):
+
+    def __mul__(self, other):
+        return mul(self, other)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __init__(self, data, name=None):
         self.data = data
         self.grad = None  # 定义梯度
         self.creator = None  # 定义创建者
         self.generation = 0  # 设置 Variable 变量的 generation，用来确定优先级
+
+    def __repr__(self):
+        if self.data is None:
+            return "variable(None)"
+        p = str(self.data).replace("\n", "\n" + ' ' * 9)
+        return "variable(" + p + ")"
+
+    @property
+    def shape(self):
+        return self.data.shape
+
+    @property
+    def ndim(self):
+        return self.data.ndim
+
+    @property
+    def size(self):
+        return self.data.size
+
+    @property
+    def dtype(self):
+        return self.data.dtype
 
     # 设置创建变量的函数，函数是变量的创建者
     def set_creator(self, func):
@@ -73,6 +108,8 @@ class Variable:
     def clean_grad(self):
         self.grad = None
 
+Variable.__mul__ = mul
+Variable.__add__ = add
 
 class Function:
     def __call__(self, *inputs):
@@ -130,6 +167,20 @@ class AddFunction(Function):
 
     def backward(self, gy):
         return gy, gy
+
+
+class MulFunction(Function):
+    def forward(self, x0, x1):
+        y = x0 * x1
+        return y
+
+    def backward(self, gy):
+        x0 = self.inputs[0].data
+        x1 = self.inputs[1].data
+        return gy * x1, gy * x0
+
+
+
 
 
 class Config:
