@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from step_02.step02 import *
+from ch_02.step02 import *
 
 
 def add(x0, x1):
@@ -22,9 +22,6 @@ class MyTestCase(unittest.TestCase):
         for i in range(10):
             x = Variable(np.random.rand(10000))
             y = square(square(square(x)))
-
-
-
 
 
 if __name__ == '__main__':

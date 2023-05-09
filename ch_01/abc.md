@@ -93,7 +93,7 @@ class ExpFunction(Function):
 import unittest
 import numpy as np
 
-from step_02 import Variable, Function, ExpFunction, SquareFunction
+from ch_02 import Variable, Function, ExpFunction, SquareFunction
 
 # class MyTestCase(unittest.TestCase):
 #     def test_something(self):
