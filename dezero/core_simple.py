@@ -1,6 +1,7 @@
 import numpy as np
 import weakref
 import contextlib
+import math
 
 
 def as_array(x):
@@ -53,6 +54,10 @@ def pow(x, c):
     return PowFunction(c)(x)
 
 
+def sin(x):
+    return SinFunction()(x)
+
+
 class Variable:
     # 为了计算 np.array + Variable
     # 定义 Variable 运算符的优先级高于 np.array
@@ -66,6 +71,7 @@ class Variable:
 
     def __init__(self, data, name=None):
         self.data = data
+        self.name = name
         self.grad = None  # 定义梯度
         self.creator = None  # 定义创建者
         self.generation = 0  # 设置 Variable 变量的 generation，用来确定优先级
@@ -281,6 +287,18 @@ class PowFunction(Function):
         x = self.inputs[0].data
         c = self.c
         gx = c * x ** (c - 1) * gy
+        return gx
+
+
+class SinFunction(Function):
+
+    def forward(self, x):
+        y = np.sin(x)
+        return y
+
+    def backward(self, gy):
+        x = self.inputs[0].data
+        gx = gy * np.cos(x)
         return gx
 
 
