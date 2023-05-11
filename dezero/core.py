@@ -66,6 +66,7 @@ class Variable:
 
     def __init__(self, data, name=None):
         self.data = data
+        self.name = name
         self.grad = None  # 定义梯度
         self.creator = None  # 定义创建者
         self.generation = 0  # 设置 Variable 变量的 generation，用来确定优先级
@@ -140,7 +141,7 @@ class Variable:
                     if x.grad is None:
                         x.grad = gx
                     else:
-                        x.grad = x.grad + gx # 这里是两个 Variable 加法运算
+                        x.grad = x.grad + gx  # 这里是两个 Variable 加法运算
                         # x.grad += gx,  # 上面的代码可以，这句代码不行，不理解
 
                     if x.creator is not None:
@@ -159,7 +160,6 @@ def setup_variable():
     Variable.__mul__ = mul
     Variable.__rmul__ = mul
     Variable.__add__ = add
-    Variable.__radd__ = add
     Variable.__radd__ = add
     Variable.__neg__ = neg
     Variable.__sub__ = sub
@@ -284,7 +284,7 @@ class PowFunction(Function):
         return y
 
     def backward(self, gy):
-        x = self.inputs
+        x = self.inputs[0]
         c = self.c
         gx = c * x ** (c - 1) * gy
         return gx
@@ -294,6 +294,7 @@ class Config:
     enable_backprop = True
 
 
+@contextlib.contextmanager
 def using_config(name, value):
     old_value = getattr(Config, name)
     setattr(Config, name, value)
