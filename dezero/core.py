@@ -105,11 +105,13 @@ class Variable:
             x.backward()  # 递归调用前一个变量的梯度
 
     # 递归修改为循环
-    def backward(self, retain_grad=False):
+    def backward(self, retain_grad=False, create_graph=False):
 
         # 为了省去 y.grad = np.array(1.0)， 引入如下的代码
         if self.grad is None:
-            self.grad = np.ones_like(self.data)
+            # self.grad = np.ones_like(self.data)
+            # 修改grad为Variable实例，计算反向转播时，计算图就会创建
+            self.grad = Variable(np.ones_like(self.data))
 
         funcs = []
         seen_set = set()
@@ -126,25 +128,27 @@ class Variable:
             f = funcs.pop()
             # 将 output.grad 修改为output().grad，解决循环引用
             gys = [output().grad for output in f.outputs]  # 将输出变量outputs的导数保存在集合gys中
-            gxs = f.backward(*gys)  # 调用反向传播，解包gys， 将gys参数列表作为传参进行反向传播计算
-            if not isinstance(gxs, tuple):  # 如果 gxs 不是tuple，转换为tuple
-                gxs = (gxs,)
 
-            # inputs 和 gxs 一一对应
-            for x, gx in zip(f.inputs, gxs):
-                # x.grad = gx  # 将计算得到的导数gxs，赋值给输入变量的属性值grad, 不过本行代码有问题，变量重复使用
-                if x.grad is None:
-                    x.grad = gx
-                else:
-                    x.grad = x.grad + gx
-                    # x.grad += gx,  # 上面的代码可以，这句代码不行，不理解
+            with using_config("enable_backprop", create_graph):
+                gxs = f.backward(*gys)  # 主要的 backward处理
+                if not isinstance(gxs, tuple):  # 如果 gxs 不是tuple，转换为tuple
+                    gxs = (gxs,)
 
-                if x.creator is not None:
-                    add_func(x.creator)
+                # inputs 和 gxs 一一对应
+                for x, gx in zip(f.inputs, gxs):
+                    # x.grad = gx  # 将计算得到的导数gxs，赋值给输入变量的属性值grad, 不过本行代码有问题，变量重复使用
+                    if x.grad is None:
+                        x.grad = gx
+                    else:
+                        x.grad = x.grad + gx # 这里是两个 Variable 加法运算
+                        # x.grad += gx,  # 上面的代码可以，这句代码不行，不理解
 
-            if not retain_grad:
-                for y in f.outputs:
-                    y().grad = None
+                    if x.creator is not None:
+                        add_func(x.creator)
+
+                if not retain_grad:
+                    for y in f.outputs:
+                        y().grad = None
 
     # 清空梯度，变量进行重复计算时，需要清空梯度
     def clean_grad(self):
@@ -230,8 +234,9 @@ class MulFunction(Function):
         return y
 
     def backward(self, gy):
-        x0 = self.inputs[0].data
-        x1 = self.inputs[1].data
+        # x0 = self.inputs[0].data
+        # x1 = self.inputs[1].data
+        x0, x1 = self.inputs
         return gy * x1, gy * x0
 
 
@@ -261,8 +266,9 @@ class DivFunction(Function):
         return y
 
     def backward(self, gy):
-        x0 = self.inputs[0].data
-        x1 = self.inputs[1].data
+        # x0 = self.inputs[0].data
+        # x1 = self.inputs[1].data
+        x0, x1 = self.inputs
         gx0 = gy / x1
         gx1 = gy * (-x0 / x1 ** 2)
         return gx0, gx1
@@ -278,7 +284,7 @@ class PowFunction(Function):
         return y
 
     def backward(self, gy):
-        x = self.inputs[0].data
+        x = self.inputs
         c = self.c
         gx = c * x ** (c - 1) * gy
         return gx
