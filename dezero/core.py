@@ -157,7 +157,6 @@ class Variable:
 
 
 def setup_variable():
-    print("...................")
     Variable.__mul__ = mul
     Variable.__rmul__ = mul
     Variable.__add__ = add
