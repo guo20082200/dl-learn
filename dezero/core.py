@@ -157,6 +157,7 @@ class Variable:
 
 
 def setup_variable():
+    print("...................")
     Variable.__mul__ = mul
     Variable.__rmul__ = mul
     Variable.__add__ = add
@@ -256,7 +257,7 @@ class SubFunction(Function):
         return y
 
     def backward(self, gy):
-        return -gy
+        return gy, -gy
 
 
 # 除法
