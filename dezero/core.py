@@ -2,6 +2,8 @@ import numpy as np
 import weakref
 import contextlib
 
+import dezero
+
 
 def as_array(x):
     if np.isscalar(x):
@@ -70,6 +72,11 @@ class Variable:
         self.grad = None  # 定义梯度
         self.creator = None  # 定义创建者
         self.generation = 0  # 设置 Variable 变量的 generation，用来确定优先级
+
+    def reshape(self, *shape):
+        if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
+            shape = shape[0]
+        return dezero.functions.reshape(self, shape)
 
     def __repr__(self):
         if self.data is None:

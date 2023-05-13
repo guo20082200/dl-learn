@@ -1,9 +1,7 @@
 import numpy as np
-from scipy.optimize import rosen
-import matplotlib.pyplot as plt
 
-from dezero.core import Variable
 import dezero.functions as F
+from dezero.core import Variable
 
 # 测试 reshape
 x = Variable(np.array([[1, 2, 3], [4, 6, 7]]))
@@ -16,3 +14,18 @@ print(x.grad)
 # variable([[1 1 1]
 #           [1 1 1]])
 # ------------------------
+
+# 测试变量的reshape方法
+a = Variable(np.random.randn(1, 2, 3))
+y1 = a.reshape((2, 3))
+y2 = a.reshape(2, 3)
+print(a)
+print(y1)
+print(y2)
+
+
+# 测试矩阵的转置
+b = np.array([[1, 2, 3], [4, 6, 7]])
+y3 = np.transpose(b)
+print(b)
+print(y3)

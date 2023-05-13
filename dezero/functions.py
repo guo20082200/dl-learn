@@ -1,4 +1,6 @@
-from dezero.core import *
+from dezero.core import Function
+from dezero.core import as_variable
+import numpy as np
 
 
 # =============================================================================
