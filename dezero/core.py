@@ -78,6 +78,13 @@ class Variable:
             shape = shape[0]
         return dezero.functions.reshape(self, shape)
 
+    def transpose(self):
+        return dezero.functions.transpose(self)
+
+    @property
+    def T(self):
+        return dezero.functions.transpose(self)
+
     def __repr__(self):
         if self.data is None:
             return "variable(None)"

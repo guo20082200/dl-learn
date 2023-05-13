@@ -29,3 +29,10 @@ b = np.array([[1, 2, 3], [4, 6, 7]])
 y3 = np.transpose(b)
 print(b)
 print(y3)
+
+# 测试Variable的转置
+c = Variable(np.array([[10, 20, 30], [4, 6, 7]]))
+y4 = F.transpose(c)
+print(c)
+print(y4)
+print(y4.T)
