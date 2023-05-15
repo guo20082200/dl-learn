@@ -80,7 +80,7 @@ class Sum(Function):
 
     def forward(self, x):
         self.x_shape = x.shape
-        y = np.sum(axis=self.axis, keepdims=self.keepdims)
+        y = x.sum(axis=self.axis, keepdims=self.keepdims)
         return y
 
     def backward(self, gy):
@@ -89,7 +89,7 @@ class Sum(Function):
         return gx
 
 
-def sum(x, axis, keepdims):
+def sum(x, axis=None, keepdims=False):
     return Sum(axis, keepdims)(x)
 
 

@@ -73,7 +73,7 @@ class Variable:
         self.creator = None  # 定义创建者
         self.generation = 0  # 设置 Variable 变量的 generation，用来确定优先级
 
-    def sum(self, axis = None, keepdims = False):
+    def sum(self, axis=None, keepdims=False):
         return dezero.functions.sum(self, axis, keepdims)
 
     def reshape(self, *shape):
