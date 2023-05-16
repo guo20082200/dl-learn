@@ -43,9 +43,9 @@ class Variable:
     __array_priority__ = 200
 
     def __init__(self, data, name=None):
-        if data is not None:
-            if not isinstance(data, np.ndarray):
-                raise TypeError('{} is not supported'.format(type(data)))
+        # if data is not None:
+        #     if not isinstance(data, numpy.ndarray):
+        #         raise TypeError('{} is not supported'.format(type(data)))
 
         self.data = data
         self.name = name
@@ -166,9 +166,8 @@ def setup_variable():
     Variable.__truediv__ = div
     Variable.__rtruediv__ = rdiv
     Variable.__pow__ = pow
-
-    # Variable.matmul = dezero.functions.matmul
-    # Variable.dot = dezero.functions.matmul
+    Variable.matmul = dezero.functions.matmul
+    Variable.dot = dezero.functions.matmul
     # Variable.max = dezero.functions.max
     # Variable.min = dezero.functions.min
 

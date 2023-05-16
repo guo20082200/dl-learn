@@ -13,6 +13,7 @@ import dezero.functions as F
 
 np.random.seed(0)
 x = np.random.rand(100, 1)
+
 y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
 
 I, H, O = 1, 10, 1
@@ -31,6 +32,8 @@ def predict(x):
 
 lr = 0.2
 iters = 10000
+
+print(type(y))
 
 for i in range(iters):
     y_pred = predict(x)
