@@ -29,14 +29,10 @@ def no_grad():
 def test_mode():
     return using_config('train', False)
 
+
 # =============================================================================
 # Variable / Function
 # =============================================================================
-
-
-
-
-
 
 
 class Variable:
@@ -101,7 +97,6 @@ class Variable:
     @property
     def T(self):
         return dezero.functions.transpose(self)
-
 
     # 递归修改为循环
     def backward(self, retain_grad=False, create_graph=False):

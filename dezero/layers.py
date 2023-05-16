@@ -5,6 +5,7 @@ import numpy as np
 from dezero.core import Parameter
 import dezero.functions as F
 
+
 class Layer:
     def __init__(self):
         self._params = set()
@@ -34,9 +35,9 @@ class Layer:
             else:
                 yield obj
 
-    def cleargrads(self):
+    def clear_grads(self):
         for param in self.params():
-            param.cleargrad()
+            param.clean_grad()
 
 
 # =============================================================================
@@ -70,3 +71,7 @@ class Linear(Layer):
 
         y = F.linear(x, self.W, self.b)
         return y
+
+    def clear_grads(self):
+        super().clear_grads()
+
