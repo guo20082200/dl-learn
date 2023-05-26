@@ -4,6 +4,10 @@ import contextlib
 
 
 class Config:
+    """
+        配置是否开始反向传播
+        True：开启
+    """
     enable_backprop = True
 
 
@@ -40,6 +44,11 @@ class Variable:
         self.grad = None
 
     def backward(self, retain_grad=False):
+        """
+
+        :param retain_grad: 中间变量的梯度是不是要保留，False-不保留
+        :return:
+        """
         if self.grad is None:
             self.grad = np.ones_like(self.data)
 
@@ -70,6 +79,9 @@ class Variable:
                 if x.creator is not None:
                     add_func(x.creator)
 
+            """
+                这里将不保留倒数的变量引用设置为：None
+            """
             if not retain_grad:
                 for y in f.outputs:
                     y().grad = None  # y is weakref
@@ -141,11 +153,13 @@ y.backward()
 print(y.grad, t.grad)  # None None
 print(x0.grad, x1.grad)  # 2.0 1.0
 
-
 with using_config('enable_backprop', False):
     x = Variable(np.array(2.0))
     y = square(x)
 
+"""
+    使用with来进行代码模式的切换
+"""
 with no_grad():
     x = Variable(np.array(2.0))
     y = square(x)

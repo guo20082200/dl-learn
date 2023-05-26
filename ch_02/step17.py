@@ -5,6 +5,7 @@ import numpy as np
 内存管理，使用weakref，减少不必要的内存
 """
 
+
 class Variable:
     def __init__(self, data):
         if data is not None:

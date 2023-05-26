@@ -115,6 +115,9 @@ class Function:
             ys = (ys,)
         outputs = [Variable(as_array(y)) for y in ys]
 
+        """
+            这里使用Config.enable_backprop来确定是否开启反向传播
+        """
         if Config.enable_backprop:
             self.generation = max([x.generation for x in inputs])
             for output in outputs:
