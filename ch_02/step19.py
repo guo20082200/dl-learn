@@ -23,6 +23,11 @@ def no_grad():
 
 class Variable:
     def __init__(self, data, name=None):
+        """
+
+        :param data:
+        :param name: 给变量起名字
+        """
         if data is not None:
             if not isinstance(data, np.ndarray):
                 raise TypeError('{} is not supported'.format(type(data)))
@@ -50,15 +55,29 @@ class Variable:
         return self.data.dtype
 
     def __len__(self):
+        """
+            返回长度
+        :return: len(self.data)
+        """
         return len(self.data)
 
     def __repr__(self):
+        """
+            打印实例的内容
+        :return:
+        """
         if self.data is None:
             return 'variable(None)'
         p = str(self.data).replace('\n', '\n' + ' ' * 9)
         return 'variable(' + p + ')'
 
     def set_creator(self, func):
+        """
+            设置变量的创建者
+            并将 generation 设置为创建者的generation + 1
+        :param func:  变量的创建者
+        :return:
+        """
         self.creator = func
         self.generation = func.generation + 1
 
