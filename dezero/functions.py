@@ -40,7 +40,8 @@ def cos(x):
 class Tanh(Function):
     def forward(self, x):
         # xp = cuda.get_array_module(x)
-        y = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+        # y = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+        y = np.tanh(x)
         return y
 
     def backward(self, gy):
