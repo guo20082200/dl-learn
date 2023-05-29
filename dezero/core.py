@@ -238,7 +238,8 @@ class Pow(Function):
         return y
 
     def backward(self, gy):
-        x = self.inputs
+        # x = self.inputs  # 这行代码不正确
+        x, = self.inputs  # TODO: 不理解
         c = self.c
 
         gx = c * x ** (c - 1) * gy
