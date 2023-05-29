@@ -22,4 +22,5 @@ labels = ["y=sin(x)", "y'", "y''", "y'''"]
 for i, v in enumerate(logs):
     plt.plot(x.data, logs[i], label=labels[i])
 plt.legend(loc='lower right')
-plt.show()
+#plt.show()
+plt.savefig("sin.png")
