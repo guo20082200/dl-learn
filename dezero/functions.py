@@ -108,20 +108,20 @@ def reshape(x, shape):
         return as_variable(x)
     return Reshape(shape)(x)
 
-#
-# class Transpose(Function):
-#
-#     def forward(self, x):
-#         y = np.transpose(x)
-#         return y
-#
-#     def backward(self, gy):
-#         gx = transpose(gy)
-#         return gx
-#
-#
-# def transpose(x):
-#     return Transpose()(x)
+
+class Transpose(Function):
+
+    def forward(self, x):
+        y = np.transpose(x)
+        return y
+
+    def backward(self, gy):
+        gx = transpose(gy)
+        return gx
+
+
+def transpose(x):
+    return Transpose()(x)
 #
 #
 # class Sum(Function):
