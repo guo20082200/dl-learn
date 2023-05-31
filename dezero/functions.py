@@ -1,3 +1,8 @@
+if '__file__' in globals():
+    import os, sys
+
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from dezero import utils
 from dezero.core import Function
 from dezero.core import as_variable
@@ -84,6 +89,7 @@ class Log(Function):
 def log(x):
     return Log()(x)
 
+
 # =============================================================================
 # Tensor operations: reshape / transpose / get_item / expand_dims / flatten
 # =============================================================================
@@ -122,109 +128,118 @@ class Transpose(Function):
 
 def transpose(x):
     return Transpose()(x)
-#
-#
-# class Sum(Function):
-#
-#     def __init__(self, axis, keepdims):
-#         self.axis = axis
-#         self.keepdims = keepdims
-#
-#     def forward(self, x):
-#         self.x_shape = x.shape
-#         y = x.sum(axis=self.axis, keepdims=self.keepdims)
-#         return y
-#
-#     def backward(self, gy):
-#         gy = utils.reshape_sum_backward(gy, self.x_shape, self.axis, self.keepdims)
-#         gx = broadcast_to(gy, self.x_shape)
-#         return gx
-#
-#
-# def sum(x, axis=None, keepdims=False):
-#     return Sum(axis, keepdims)(x)
-#
-#
-# class BroadcastTo(Function):
-#
-#     def __init__(self, shape):
-#         self.shape = shape
-#
-#     def forward(self, x):
-#         self.x_shape = x.shape
-#         y = np.broadcast_to(x, self.shape)
-#         return y
-#
-#     def backward(self, gy):
-#         gx = sum_to(gy, self.x_shape)  # BroadcastTo 的反向传播就是 sum_to
-#         return gx
-#
-#
-# def broadcast_to(x, shape):
-#     if x.shape == shape:
-#         return as_variable(x)
-#     return BroadcastTo(shape)(x)
-#
-#
-# class SumTo(Function):
-#     def __init__(self, shape):
-#         self.shape = shape
-#
-#     def forward(self, x):
-#         self.x_shape = x.shape
-#         y = utils.sum_to(x, self.shape)
-#         return y
-#
-#     def backward(self, gy):
-#         gx = broadcast_to(gy, self.x_shape)
-#         return gx
-#
-#
-# def sum_to(x, shape):
-#     if x.shape == shape:
-#         return as_variable(x)
-#     return SumTo(shape)(x)
-#
-#
-# class MatMul(Function):
-#     def forward(self, x, W):
-#         y = x.dot(W)
-#         return y
-#
-#     def backward(self, gy):
-#         x, W = self.inputs
-#         gx = matmul(gy, W.T)
-#         gW = matmul(x.T, gy)
-#         return gx, gW
-#
-#
-# def matmul(x, W):
-#     return MatMul()(x, W)
-#
-#
-# class MeanSquaredError(Function):
-#     def forward(self, x0, x1):
-#         diff = x0 - x1
-#         y = (diff ** 2).sum() / len(diff)
-#         return y
-#
-#     def backward(self, gy):
-#         x0, x1 = self.inputs
-#         diff = x0 - x1
-#         gx0 = gy * diff * (2. / len(diff))
-#         gx1 = -gx0
-#         return gx0, gx1
-#
-#
-# def mean_squared_error(x0, x1):
-#     return MeanSquaredError()(x0, x1)
-#
-#
-# def mean_squared_error_simple(x0, x1):
-#     diff = x0 - x1
-#     return sum(diff ** 2) / len(diff)
-#
-#
+
+
+class Sum(Function):
+
+    def __init__(self, axis, keepdims):
+        self.axis = axis
+        self.keepdims = keepdims
+
+    def forward(self, x):
+        self.x_shape = x.shape
+        y = x.sum(axis=self.axis, keepdims=self.keepdims)
+        return y
+
+    def backward(self, gy):
+        gy = utils.reshape_sum_backward(gy, self.x_shape, self.axis, self.keepdims)
+        gx = broadcast_to(gy, self.x_shape)
+        return gx
+
+
+def sum(x, axis=None, keepdims=False):
+    return Sum(axis, keepdims)(x)
+
+class BroadcastTo(Function):
+
+    def __init__(self, shape):
+        self.shape = shape
+
+    def forward(self, x):
+        """
+            需要将 x 广播为可以进行张量运算的张量
+        :param x:
+        :return:
+        """
+        self.x_shape = x.shape
+        y = np.broadcast_to(x, self.shape)
+        return y
+
+    def backward(self, gy):
+        """
+            将已经广播的张量求和，返回为x的shape
+        :param gy:
+        :return:
+        """
+        gx = sum_to(gy, self.x_shape)  # BroadcastTo 的反向传播就是 sum_to
+        return gx
+
+
+def broadcast_to(x, shape):
+    if x.shape == shape:
+        return as_variable(x)
+    return BroadcastTo(shape)(x)
+
+
+class SumTo(Function):
+    def __init__(self, shape):
+        self.shape = shape
+
+    def forward(self, x):
+        self.x_shape = x.shape
+        y = utils.sum_to(x, self.shape)
+        return y
+
+    def backward(self, gy):
+        gx = broadcast_to(gy, self.x_shape)
+        return gx
+
+
+def sum_to(x, shape):
+    if x.shape == shape:
+        return as_variable(x)
+    return SumTo(shape)(x)
+
+
+class MatMul(Function):
+    def forward(self, x, W):
+        y = x.dot(W)
+        return y
+
+    def backward(self, gy):
+        x, W = self.inputs
+        gx = matmul(gy, W.T)
+        gW = matmul(x.T, gy)
+        return gx, gW
+
+
+def matmul(x, W):
+    return MatMul()(x, W)
+
+
+class MeanSquaredError(Function):
+    def forward(self, x0, x1):
+        diff = x0 - x1
+        y = (diff ** 2).sum() / len(diff)
+        return y
+
+    def backward(self, gy):
+        x0, x1 = self.inputs
+        diff = x0 - x1
+        gx0 = gy * diff * (2. / len(diff))
+        gx1 = -gx0
+        return gx0, gx1
+
+
+def mean_squared_error(x0, x1):
+    return MeanSquaredError()(x0, x1)
+
+
+def mean_squared_error_simple(x0, x1):
+    diff = x0 - x1
+    return sum(diff ** 2) / len(diff)
+
+
 # def linear_simple(x, W, b=None):
 #     t = matmul(x, W)
 #     if b is None:
