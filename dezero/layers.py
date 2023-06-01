@@ -16,7 +16,7 @@ class Layer:
         super().__setattr__(name, value)
 
     def __call__(self, *inputs):
-        outputs = self.forward(inputs)  # forward 方法将x映射为y
+        outputs = self.forward(*inputs)  # forward 方法将x映射为y
         if not isinstance(outputs, tuple):
             outputs = (outputs,)  # 将y装换为tuple类型
         self.inputs = [weakref.ref(x) for x in inputs]  # 使用weakref，方便回收
@@ -61,7 +61,7 @@ class Linear(Layer):
         if nobias:
             self.b = None
         else:
-            self.b = Parameter(np.zeros(0, dtype=dtype), name='b')
+            self.b = Parameter(np.zeros(out_size, dtype=dtype), name='b')
 
     def _init_W(self):
         """
@@ -69,12 +69,12 @@ class Linear(Layer):
         :return:
         """
         I, O = self.in_size, self.out_size
-        W_data = np.random.randn(I, O).astype(dtype) * np.sqrt(1 / I)
+        W_data = np.random.randn(I, O).astype(self.dtype) * np.sqrt(1 / I)
         self.W.data = W_data
 
     def forward(self, x):
         # 在传播数据时根据x的大小来初始化权重
-        if self.W is None:
+        if self.W.data is None:
             self.in_size = x.shape[1]
             self._init_W()
 

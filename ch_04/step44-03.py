@@ -6,10 +6,11 @@ if '__file__' in globals():
 
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
+from dezero import Variable
 import dezero.functions as F
 import dezero.layers as L
+import matplotlib.pyplot as plt
 
-from dezero import Variable, Parameter, Layer
 
 # 使用Layer来实现神经网络
 
@@ -46,3 +47,13 @@ for i in range(iters):
             p.data -= lr * p.grad.data
     if i % 1000 == 0:
         print(loss)
+
+
+# Plot
+plt.scatter(x, y, s=10)
+plt.xlabel('x')
+plt.ylabel('y')
+t = np.arange(0, 1, .01)[:, np.newaxis]
+y_pred = predict(t)
+plt.plot(t, y_pred.data, color='r')
+plt.savefig("step44-03.png")
