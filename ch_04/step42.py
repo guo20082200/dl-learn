@@ -1,3 +1,7 @@
+if '__file__' in globals():
+    import os, sys
+
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 
 import sys  # 导入sys模块
@@ -34,8 +38,8 @@ for i in range(iters):
     loss = F.mean_squared_error(y, y_pred)
     print(loss)
 
-    W.clean_grad()
-    b.clean_grad()
+    W.cleargrad()
+    b.cleargrad()
     loss.backward()
 
     # Update .data attribute (No need grads when updating params)
@@ -50,4 +54,4 @@ plt.xlabel('x')
 plt.ylabel('y')
 y_pred = predict(x)
 plt.plot(x.data, y_pred.data, color='r')
-plt.show()
+plt.savefig("linear-regression.png")
