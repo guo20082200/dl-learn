@@ -3,6 +3,7 @@ import numpy as np
 import contextlib
 import dezero
 
+
 class Config:
     enable_backprop = True
 
@@ -122,6 +123,10 @@ class Variable:
                 if not retain_grad:
                     for y in f.outputs:
                         y().grad = None  # y is weakref
+
+
+class Parameter(Variable):
+    pass
 
 
 def as_variable(obj):
