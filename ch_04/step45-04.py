@@ -12,7 +12,9 @@ import dezero.models as M
 import matplotlib.pyplot as plt
 
 """
-    使用 TwoLayerNet 来解决sin函数的回归问题
+    使用 MLP 来解决sin函数的回归问题
+    model = M.MLP((10, 1)): 定义了两层网络
+    model = M.MLP((2,3,4,5,1)): 定义了5层网络
 """
 
 np.random.seed(0)
@@ -23,35 +25,20 @@ hidden_size = 10
 lr = 0.2
 iters = 10000
 
-model = M.TwoLayerNet(hidden_size, 1)
-
-l1 = L.Linear(10)
-l2 = L.Linear(1)
-
-
-def predict(x):
-    y = l1(x)
-    y = F.sigmoid(y)
-    y = l2(y)
-    return y
-
+model = M.MLP((hidden_size, 1))
 
 for i in range(iters):
-    y_pred = predict(x)
+    y_pred = model(x)
+
     loss = F.mean_squared_error(y, y_pred)
 
     # 清空梯度
-    l1.cleargrads()
-    l2.cleargrads()
+    model.cleargrads()
     loss.backward()
 
     # 逐步修正参数
-    for l in [l1, l2]:
-        for p in l.params():
-            p.data -= lr * p.grad.data
-
-    # for p in model.params():
-    #     p.data -= lr * p.grad.data
+    for p in model.params():
+        p.data -= lr * p.grad.data
     if i % 1000 == 0:
         print(loss)
         # print(y_pred)
@@ -64,4 +51,4 @@ t = np.arange(0, 1, .01)[:, np.newaxis]
 y_pred = model(t)
 # print(y_pred)
 plt.plot(t, y_pred.data, color='r')
-plt.savefig("step45-03-TwoLayerNet.png")
+plt.savefig("step45-04-TwoLayerNet.png")

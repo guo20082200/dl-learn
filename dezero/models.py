@@ -29,3 +29,25 @@ class TwoLayerNet(Model):
         y = F.sigmoid(self.l1(x))
         y = self.l2(y)
         return y
+
+
+class MLP(Model):
+    """
+        multi layer perception
+        更加通用的神经网络类
+    """
+
+    def __init__(self, fc_out_size, activation=F.sigmoid):
+        super().__init__()
+        self.activation = activation
+        self.layers = []
+
+        for i, out_size in enumerate(fc_out_size):
+            layer = L.Linear(out_size)
+            setattr(self, 'l' + str(i), layer)
+            self.layers.append(layer)
+
+    def forward(self, x):
+        for l in self.layers[:-1]:
+            x = self.activation(l(x))
+        return self.layers[-1](x)
