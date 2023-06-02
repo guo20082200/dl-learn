@@ -25,33 +25,18 @@ iters = 10000
 
 model = M.TwoLayerNet(hidden_size, 1)
 
-l1 = L.Linear(10)
-l2 = L.Linear(1)
-
-
-def predict(x):
-    y = l1(x)
-    y = F.sigmoid(y)
-    y = l2(y)
-    return y
-
 
 for i in range(iters):
-    y_pred = predict(x)
+    y_pred = model(x)
     loss = F.mean_squared_error(y, y_pred)
 
     # 清空梯度
-    l1.cleargrads()
-    l2.cleargrads()
+    model.cleargrads()
     loss.backward()
 
     # 逐步修正参数
-    for l in [l1, l2]:
-        for p in l.params():
-            p.data -= lr * p.grad.data
-
-    # for p in model.params():
-    #     p.data -= lr * p.grad.data
+    for p in model.params():
+        p.data -= lr * p.grad.data
     if i % 1000 == 0:
         print(loss)
         # print(y_pred)
