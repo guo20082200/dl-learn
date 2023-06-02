@@ -11,7 +11,7 @@ class Layer:
         self._params = set()
 
     def __setattr__(self, name, value):
-        if isinstance(value, Parameter):
+        if isinstance(value, (Parameter, Layer)):
             self._params.add(name)
         super().__setattr__(name, value)
 
@@ -28,7 +28,15 @@ class Layer:
 
     def params(self):
         for name in self._params:
-            yield self.__dict__[name]  # 将所有的参数存入当前实例的dict里面
+            obj = self.__dict__[name]
+
+            if isinstance(obj, Layer):  # 如果参数是Layer
+                yield from obj.params()  # 递归从obj里面取出来数据
+                # 使用yield的函数叫做生成器，
+                # yield from使用一个生成器创建另一个生成器
+            else:
+                obj
+            # yield self.__dict__[name]  # 将所有的参数存入当前实例的dict里面
             # yield 用法同return，区别是：yield是暂停处理并返回值
 
     def cleargrads(self):
@@ -80,3 +88,5 @@ class Linear(Layer):
 
         y = F.linear(x, self.W, self.b)
         return y
+
+

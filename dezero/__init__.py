@@ -2,7 +2,10 @@
 # 从step23.py到step32.py使用simple_core
 is_simple_core = False  # True
 # =============================================================================
+if '__file__' in globals():
+    import os, sys
 
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 if is_simple_core:
     from dezero.core_simple import Variable
     from dezero.core_simple import Function
@@ -24,6 +27,7 @@ else:
     from dezero.core import Parameter
     from dezero.layers import Layer
     from dezero.layers import Linear
+    from dezero.models import Model, TwoLayerNet
 
 
 setup_variable()
