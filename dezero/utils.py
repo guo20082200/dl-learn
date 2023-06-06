@@ -1,6 +1,7 @@
 import os
 import subprocess
 from scipy.optimize import rosen
+from dezero import cuda
 
 
 def _dot_var(v, verbose=False):

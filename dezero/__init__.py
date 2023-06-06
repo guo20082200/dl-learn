@@ -28,6 +28,18 @@ else:
     from dezero.layers import Layer
     from dezero.layers import Linear
     from dezero.models import Model, TwoLayerNet
+    from dezero.datasets import Dataset
+
+
+    import dezero.datasets
+    import dezero.dataloaders
+    import dezero.optimizers
+    import dezero.functions
+    # import dezero.functions_conv
+    import dezero.layers
+    import dezero.utils
+    import dezero.cuda
+    import dezero.transforms
 
 
 setup_variable()
